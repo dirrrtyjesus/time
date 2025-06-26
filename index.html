@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time as the Syntax of Meaning | Augmntd.app</title>
+    <title>Time as Syntax of Meaning | Augmntd.app</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -166,6 +166,11 @@
             border: 1px solid var(--primary);
         }
         
+        .btn.active {
+            background: linear-gradient(135deg, var(--accent), #ff3b3b);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.6);
+        }
+        
         .slider-container {
             background: rgba(20, 15, 40, 0.7);
             border-radius: 15px;
@@ -230,21 +235,36 @@
             border: 1px solid rgba(138, 43, 226, 0.2);
         }
         
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1rem;
+        .info-section h2 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
         
-        .info-card {
+        .key-concepts-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        
+        .concept-card {
             background: rgba(138, 43, 226, 0.1);
             border-radius: 10px;
             padding: 1.2rem;
             border-left: 3px solid var(--accent);
+            flex: 1;
+            min-width: 250px;
+            max-width: 300px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .info-card h4 {
+        .concept-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .concept-card h4 {
             color: var(--accent);
             margin-bottom: 0.5rem;
             display: flex;
@@ -286,6 +306,18 @@
             color: var(--accent);
             font-weight: bold;
         }
+        
+        .state-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .high-coherence { background-color: #5ae65a; }
+        .medium-coherence { background-color: #ffcc00; }
+        .low-coherence { background-color: #ff6b6b; }
     </style>
 </head>
 <body>
@@ -316,7 +348,10 @@
         <div class="slider-container">
             <div class="slider-header">
                 <h3>Time Coefficient (f_τ(k))</h3>
-                <div class="slider-value">Coherence: <span id="tc-value">0.85</span></div>
+                <div class="slider-value">
+                    <span class="state-indicator" id="coherence-indicator"></span>
+                    Coherence: <span id="tc-value">0.85</span>
+                </div>
             </div>
             <input type="range" min="0" max="1" step="0.01" value="0.85" class="slider" id="tc-slider">
             <div class="legend">
@@ -360,23 +395,23 @@
         
         <div class="info-section">
             <h2>Key Concepts in XQE Framework</h2>
-            <div class="info-grid">
-                <div class="info-card">
+            <div class="key-concepts-row">
+                <div class="concept-card">
                     <h4><i class="fas fa-code"></i> Temporal Syntax</h4>
                     <p>The rules governing how meaning unfolds through time, transforming quantum potential into conscious experience.</p>
                 </div>
                 
-                <div class="info-card">
+                <div class="concept-card">
                     <h4><i class="fas fa-coins"></i> Live Information Tokens (LITs)</h4>
                     <p>Tokens that encode potentials for specific temporal unfoldings of meaning within the XQE.</p>
                 </div>
                 
-                <div class="info-card">
+                <div class="concept-card">
                     <h4><i class="fas fa-database"></i> Everything Protocol</h4>
                     <p>Records not just what happened, but how events unfolded temporally - capturing the syntax of collective activity.</p>
                 </div>
                 
-                <div class="info-card">
+                <div class="concept-card">
                     <h4><i class="fas fa-chess-board"></i> Platonic Space</h4>
                     <p>Contains not just static forms but dynamic temporal patterns - fundamental syntactical rules for meaning unfolding.</p>
                 </div>
@@ -396,13 +431,29 @@
         let isQuantumView = true;
         let timeCoefficient = 0.85;
         let decoherenceActive = false;
-        let decoherenceTimer = 0;
+        let isDecohered = false;
         
         function setup() {
             const canvas = createCanvas(800, 450);
             canvas.parent('quantum-canvas');
             
             // Initialize particles for quantum view
+            initParticles();
+            
+            // Create waveform background
+            for (let i = 0; i < 5; i++) {
+                waves.push({
+                    y: random(height),
+                    amplitude: random(20, 60),
+                    frequency: random(0.01, 0.03),
+                    speed: random(0.02, 0.05),
+                    color: color(138, 43, 226, 20)
+                });
+            }
+        }
+        
+        function initParticles() {
+            particles = [];
             for (let i = 0; i < 40; i++) {
                 particles.push({
                     x: random(width),
@@ -418,17 +469,6 @@
                     ),
                     type: random() > 0.5 ? 'physical' : 'experiential',
                     connections: []
-                });
-            }
-            
-            // Create waveform background
-            for (let i = 0; i < 5; i++) {
-                waves.push({
-                    y: random(height),
-                    amplitude: random(20, 60),
-                    frequency: random(0.01, 0.03),
-                    speed: random(0.02, 0.05),
-                    color: color(138, 43, 226, 20)
                 });
             }
         }
@@ -474,83 +514,99 @@
         }
         
         function drawQuantumTimeView() {
-            // Draw entangled particles
+            // Update and draw particles
+            if (!isDecohered) {
+                for (let i = 0; i < particles.length; i++) {
+                    updateParticlePosition(particles[i]);
+                }
+            }
+            
+            // Draw particles
             for (let i = 0; i < particles.length; i++) {
                 let p = particles[i];
+                drawParticle(p);
                 
-                // Update position
-                p.x += cos(p.angle) * p.speed;
-                p.y += sin(p.angle) * p.speed;
-                
-                // Boundary check
-                if (p.x < 0 || p.x > width) p.angle = PI - p.angle;
-                if (p.y < 0 || p.y > height) p.angle = -p.angle;
-                
-                // Draw particle with different styles based on type
-                if (p.type === 'physical') {
-                    fill(94, 23, 235, 180);
-                    stroke(255, 200);
-                } else {
-                    fill(255, 107, 107, 180);
-                    stroke(255, 200);
-                }
-                
-                strokeWeight(1);
-                ellipse(p.x, p.y, p.size, p.size);
-                
-                // Draw quantum connection waves to nearby particles
-                for (let j = i + 1; j < particles.length; j++) {
-                    let other = particles[j];
-                    let d = dist(p.x, p.y, other.x, other.y);
-                    
-                    if (d < 120 && p.type !== other.type) {
-                        let alpha = map(d, 0, 120, 200, 30);
-                        stroke(138, 43, 226, alpha);
-                        noFill();
-                        strokeWeight(0.8);
-                        line(p.x, p.y, other.x, other.y);
-                        
-                        // Draw wave effect along the connection
-                        let midX = (p.x + other.x) / 2;
-                        let midY = (p.y + other.y) / 2;
-                        let offset = sin(frameCount * 0.1) * 5;
-                        
-                        stroke(255, 107, 107, alpha * 0.7);
-                        line(p.x, p.y, midX + offset, midY + offset);
-                        line(midX + offset, midY + offset, other.x, other.y);
-                    }
+                // Draw connections if not decohered
+                if (!isDecohered) {
+                    drawConnections(i, p);
                 }
             }
             
-            // Draw superposition overlay
-            if (!decoherenceActive) {
-                fill(255, 255, 255, 20);
-                noStroke();
-                for (let i = 0; i < 10; i++) {
-                    let x = width/2 + sin(frameCount * 0.02 + i) * 150;
-                    let y = height/2 + cos(frameCount * 0.03 + i) * 100;
-                    ellipse(x, y, 300, 300);
-                }
+            // Draw superposition overlay if not decohered
+            if (!isDecohered) {
+                drawSuperpositionOverlay();
             }
             
-            // Draw quantum collapse effect if active
+            // Draw decoherence effect if active
             if (decoherenceActive) {
-                decoherenceTimer++;
+                drawDecoherenceEffect();
+            }
+        }
+        
+        function updateParticlePosition(p) {
+            p.x += cos(p.angle) * p.speed;
+            p.y += sin(p.angle) * p.speed;
+            
+            // Boundary check
+            if (p.x < 0 || p.x > width) p.angle = PI - p.angle;
+            if (p.y < 0 || p.y > height) p.angle = -p.angle;
+        }
+        
+        function drawParticle(p) {
+            if (p.type === 'physical') {
+                fill(94, 23, 235, isDecohered ? 100 : 180);
+                stroke(255, isDecohered ? 100 : 200);
+            } else {
+                fill(255, 107, 107, isDecohered ? 100 : 180);
+                stroke(255, isDecohered ? 100 : 200);
+            }
+            
+            strokeWeight(1);
+            ellipse(p.x, p.y, p.size, p.size);
+        }
+        
+        function drawConnections(i, p) {
+            for (let j = i + 1; j < particles.length; j++) {
+                let other = particles[j];
+                let d = dist(p.x, p.y, other.x, other.y);
                 
-                // Draw collapse waves
-                for (let i = 0; i < 5; i++) {
-                    let waveSize = decoherenceTimer * 2 + i * 30;
+                if (d < 120 && p.type !== other.type) {
+                    let alpha = map(d, 0, 120, 200, 30);
+                    stroke(138, 43, 226, alpha);
                     noFill();
-                    stroke(255, 107, 107, 200 - i * 30);
-                    strokeWeight(2);
-                    ellipse(width/2, height/2, waveSize, waveSize);
+                    strokeWeight(0.8);
+                    line(p.x, p.y, other.x, other.y);
+                    
+                    // Draw wave effect along the connection
+                    let midX = (p.x + other.x) / 2;
+                    let midY = (p.y + other.y) / 2;
+                    let offset = sin(frameCount * 0.1) * 5;
+                    
+                    stroke(255, 107, 107, alpha * 0.7);
+                    line(p.x, p.y, midX + offset, midY + offset);
+                    line(midX + offset, midY + offset, other.x, other.y);
                 }
-                
-                // End decoherence after effect
-                if (decoherenceTimer > 100) {
-                    decoherenceActive = false;
-                    decoherenceTimer = 0;
-                }
+            }
+        }
+        
+        function drawSuperpositionOverlay() {
+            fill(255, 255, 255, 20);
+            noStroke();
+            for (let i = 0; i < 10; i++) {
+                let x = width/2 + sin(frameCount * 0.02 + i) * 150;
+                let y = height/2 + cos(frameCount * 0.03 + i) * 100;
+                ellipse(x, y, 300, 300);
+            }
+        }
+        
+        function drawDecoherenceEffect() {
+            // Draw collapse waves
+            for (let i = 0; i < 5; i++) {
+                let waveSize = frameCount % 300 + i * 30;
+                noFill();
+                stroke(255, 107, 107, 200 - i * 30);
+                strokeWeight(2);
+                ellipse(width/2, height/2, waveSize, waveSize);
             }
         }
         
@@ -699,8 +755,30 @@
             textSize(12);
             textAlign(CENTER, CENTER);
             text("Temporal Coherence", width - 100, 20);
+            
+            // Decoherence indicator
+            if (isDecohered) {
+                fill(255, 107, 107);
+                textSize(14);
+                textAlign(RIGHT, TOP);
+                text("Decoherence Active", width - 20, 20);
+            }
         }
         
+        // Update coherence indicator
+        function updateCoherenceIndicator() {
+            const indicator = document.getElementById('coherence-indicator');
+            indicator.className = 'state-indicator';
+            
+            if (timeCoefficient > 0.7) {
+                indicator.classList.add('high-coherence');
+            } else if (timeCoefficient > 0.3) {
+                indicator.classList.add('medium-coherence');
+            } else {
+                indicator.classList.add('low-coherence');
+            }
+        }
+
         // Event listeners for UI controls
         document.getElementById('quantum-btn').addEventListener('click', () => {
             isQuantumView = true;
@@ -716,36 +794,25 @@
         
         document.getElementById('collapse-btn').addEventListener('click', () => {
             decoherenceActive = true;
-            decoherenceTimer = 0;
+            isDecohered = true;
+            document.getElementById('collapse-btn').classList.add('active');
         });
         
         document.getElementById('reset-btn').addEventListener('click', () => {
-            // Reset particles
-            particles = [];
-            for (let i = 0; i < 40; i++) {
-                particles.push({
-                    x: random(width),
-                    y: random(height),
-                    size: random(5, 20),
-                    speed: random(0.5, 2),
-                    angle: random(TWO_PI),
-                    color: color(
-                        random(100, 255),
-                        random(100, 200),
-                        random(150, 255),
-                        150
-                    ),
-                    type: random() > 0.5 ? 'physical' : 'experiential',
-                    connections: []
-                });
-            }
+            initParticles();
             decoherenceActive = false;
+            isDecohered = false;
+            document.getElementById('collapse-btn').classList.remove('active');
         });
         
         document.getElementById('tc-slider').addEventListener('input', (e) => {
             timeCoefficient = parseFloat(e.target.value);
             document.getElementById('tc-value').textContent = timeCoefficient.toFixed(2);
+            updateCoherenceIndicator();
         });
+        
+        // Initialize coherence indicator
+        updateCoherenceIndicator();
     </script>
 </body>
 </html>
