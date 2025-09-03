@@ -3,202 +3,440 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Illusion of the Hard Problem of Consciousness</title>
+    <title>The Architecture of Time: An Interactive Exploration</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chosen Palette: "Cosmic Inquiry" (Custom deep blues and purples) -->
-    <!-- Application Structure Plan: The SPA is structured as a linear, narrative journey down the page, divided into four key sections that mirror the source document's argument: 1) Defining the Problem, 2) The Quantum Perspective, 3) The Interactive "Paradox Creator," and 4) The Conclusion. This structure is chosen to build the argument step-by-step, ensuring clarity before introducing the core interactive element. The primary interaction is a toggle that visually transforms the model of consciousness, making the central thesis intuitive and memorable. -->
-    <!-- Visualization & Content Choices: 1. The "Linear Trap" Diagram: Goal: Organize/Inform. Viz: HTML/CSS flowchart showing a linear cause-and-effect chain. Justification: Clearly visualizes the standard, problematic framing of consciousness. 2. The "Quantum Potential" Diagram: Goal: Organize/Inform. Viz: HTML/CSS diagram showing a central, unified source. Justification: Presents the alternative, non-linear model. 3. The Interactive Toggle: Goal: Change/Relate. Viz: JavaScript-powered animation that morphs between the two diagrams. Justification: This is the core of the SPA, allowing users to actively see the "unfolding" of the paradox, making the abstract argument tangible and impactful. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Neutral Harmony -->
+    <!-- Application Structure Plan: The SPA is designed as a thematic journey, starting with fundamental physics, moving to biophysics, then human biology/psychology, its pathologies, and finally speculative futures. This non-linear structure, organized by a persistent side navigation, allows users to explore complex, interrelated topics in a logical progression from the abstract to the concrete and then to the speculative. This is more intuitive than mirroring the structure of any single source document, as it builds a conceptual foundation for the user. Key interactions include an interactive chart to compare clock types and a clickable card grid to explore different forms of "Dissonance," making dense information digestible and engaging. -->
+    <!-- Visualization & Content Choices: 1) Reality Architectures: Goal: Compare A/B theories. Method: Side-by-side text layout with Unicode icons. Justification: Direct comparison is clearest for this foundational dichotomy. 2) The Electrome: Goal: Explain the bioelectric field. Method: Interactive HTML/CSS diagram with clickable hotspots. Justification: Makes a multi-scale concept tangible. 3) The Clocks Within: Goal: Compare biological vs. perceptual clocks. Method: Interactive Chart.js doughnut chart. Justification: More engaging than a static table and visually shows relationships. 4) Biotemporal Dissonance: Goal: Detail the types of dissonance. Method: Interactive grid of "flippable" cards. Justification: A familiar UI pattern for exploring categorized data. 5) XQE Framework: Goal: Explain speculative physics. Method: HTML/CSS flowchart diagram with tooltips. Justification: Simplifies an abstract process into a visual sequence. All choices use HTML/CSS/Canvas and avoid SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d1117;
-            color: #c9d1d9;
+            background-color: #f4f3f1;
+            color: #374151;
         }
-        .header-gradient {
-            background: linear-gradient(90deg, #c084fc, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #e7e5e4;
+            color: #1c1917;
+            transform: translateX(4px);
+        }
+        .content-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .content-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .card-container {
+            perspective: 1000px;
         }
         .card {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 1rem;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
         }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(167, 139, 250, 0.7); }
-            50% { transform: scale(1.02); box-shadow: 0 0 20px 10px rgba(167, 139, 250, 0); }
+        .card.is-flipped {
+            transform: rotateY(180deg);
         }
-        .quantum-orb {
-            animation: pulse 4s infinite;
+        .card-face {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
         }
-        .toggle-btn {
-            transition: all 0.3s ease;
+        .card-back {
+            transform: rotateY(180deg);
         }
-        .toggle-btn.active {
-            background-color: #a78bfa;
-            color: #161b22;
-            box-shadow: 0 0 15px rgba(167, 139, 250, 0.5);
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: auto;
+            max-height: 450px;
         }
-        .diagram-container div {
-            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
-<body class="antialiased leading-relaxed">
+<body class="antialiased">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <nav id="sidebar" class="w-full md:w-64 bg-stone-200/50 p-4 md:p-6 md:fixed md:h-full">
+            <h1 class="text-xl font-bold text-stone-800 mb-2">The Architecture of Time</h1>
+            <p class="text-sm text-stone-600 mb-8">An Interactive Exploration</p>
+            <ul class="space-y-2">
+                <li><a href="#reality" class="nav-link block p-2 rounded-md font-medium text-stone-700">1. Fabric of Reality</a></li>
+                <li><a href="#electrome" class="nav-link block p-2 rounded-md font-medium text-stone-700">2. Blueprint of Life</a></li>
+                <li><a href="#clocks" class="nav-link block p-2 rounded-md font-medium text-stone-700">3. The Clocks Within</a></li>
+                <li><a href="#dissonance" class="nav-link block p-2 rounded-md font-medium text-stone-700">4. When Time Breaks Down</a></li>
+                <li><a href="#xqe" class="nav-link block p-2 rounded-md font-medium text-stone-700">5. Speculative Frontiers</a></li>
+            </ul>
+        </nav>
 
-        <header class="text-center py-16">
-            <h1 class="text-4xl md:text-6xl font-extrabold header-gradient mb-4">The Illusion of the Hard Problem</h1>
-            <p class="text-xl text-gray-400 mt-2">A Consequence of Linear Time</p>
-        </header>
+        <main class="flex-1 md:ml-64 p-6 md:p-12">
+            <section id="intro" class="mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-stone-900 mb-4">An Interactive Synthesis</h2>
+                <p class="text-lg text-stone-700 max-w-3xl">This application synthesizes findings from temporal metaphysics, biophysics, and chronobiology to explore the nature of time—from the fabric of reality to the rhythms of life. Navigate through the sections to uncover the fundamental conflicts in physics, the biological basis of form, the clocks that govern our bodies, and the dissonances that arise when these systems misalign.</p>
+            </section>
 
-        <section id="problem" class="card p-8 mb-16">
-            <h2 class="text-3xl font-bold mb-4 text-center text-white">1. The Linear Time "Trap"</h2>
-            <p class="text-gray-400 max-w-3xl mx-auto text-center mb-10">The Hard Problem of Consciousness exists because we intuitively view reality through a linear, cause-and-effect timeline. We assume a physical event must *cause* a separate mental event, creating an unbridgeable explanatory gap.</p>
-            <div class="flex items-center justify-center space-x-4 md:space-x-8 p-6 bg-black/20 rounded-lg">
-                <div class="card p-4 text-center w-40">
-                    <h3 class="font-bold">Neural Firing</h3>
-                    <p class="text-sm text-gray-400">(Event A)</p>
-                </div>
-                <div class="text-4xl font-mono text-purple-400 relative">
-                    &rarr;
-                    <span class="absolute -top-8 left-1/2 -translate-x-1/2 text-2xl text-red-500 font-bold animate-pulse">?</span>
-                </div>
-                <div class="card p-4 text-center w-40">
-                    <h3 class="font-bold">Experience of "Red"</h3>
-                    <p class="text-sm text-gray-400">(Event B)</p>
-                </div>
-            </div>
-             <p class="text-center text-gray-500 mt-4 italic">This arrow is the "Hard Problem." What is it, and how does it work?</p>
-        </section>
-
-        <section id="perspective" class="card p-8 mb-16">
-            <h2 class="text-3xl font-bold mb-4 text-center text-white">2. The Quantum Time Perspective</h2>
-            <p class="text-gray-400 max-w-3xl mx-auto text-center mb-10">A deeper model suggests a non-linear "Quantum Time" where the physical and experiential are not sequential. They are two facets of a single, unified potential, entangled at their source. In this realm, there is no sequence, and therefore, no gap to explain.</p>
-            <div class="flex items-center justify-center p-6 bg-black/20 rounded-lg min-h-[150px]">
-                <div class="relative flex items-center justify-center">
-                    <div class="card quantum-orb p-6 text-center z-10">
-                        <h3 class="font-bold">Unified Potential</h3>
-                        <p class="text-sm text-gray-400">("Experiential-Physical Event")</p>
-                    </div>
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <div class="absolute -left-48 top-1/2 -translate-y-1/2 card p-3 text-center w-40">
-                             <h3 class="font-semibold">Physical Aspect</h3>
+            <section id="reality" class="content-section min-h-screen pt-16">
+                <h3 class="text-2xl md:text-3xl font-bold mb-2">I. The Two Architectures of Reality</h3>
+                <p class="text-stone-600 mb-8 max-w-3xl">At the base of reality, two competing theories describe the fundamental nature of time itself. This foundational conflict, rooted in ancient Greek philosophy, frames the entire discussion of how time is understood in both physics and our own experience.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white/60 p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-4xl">🌊</span>
+                            <h4 class="text-xl font-semibold text-stone-800">A-Theory (Dynamic "Becoming")</h4>
                         </div>
-                         <div class="absolute -right-48 top-1/2 -translate-y-1/2 card p-3 text-center w-40">
-                            <h3 class="font-semibold">Experiential Aspect</h3>
+                        <p class="mb-4"><strong>Core Idea:</strong> Time is a real, flowing process. The present moment is a privileged, moving "now" that travels from a fixed past into an open, undetermined future.</p>
+                        <ul class="space-y-2">
+                            <li class="font-semibold">Keywords:</li>
+                            <li><span class="bg-sky-100 text-sky-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">Flowing Time</span></li>
+                            <li><span class="bg-sky-100 text-sky-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">The "Now" is Special</span></li>
+                            <li><span class="bg-sky-100 text-sky-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">Temporal Becoming</span></li>
+                        </ul>
+                        <p class="mt-6 text-sm italic text-stone-500">This view aligns with our intuitive human experience.</p>
+                    </div>
+                    <div class="bg-white/60 p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-4xl">🧊</span>
+                            <h4 class="text-xl font-semibold text-stone-800">B-Theory (Static "Being")</h4>
                         </div>
+                        <p class="mb-4"><strong>Core Idea:</strong> The "flow" of time is a subjective illusion. Past, present, and future are equally real and co-exist in a static 4D "block universe."</p>
+                        <ul class="space-y-2">
+                            <li class="font-semibold">Keywords:</li>
+                            <li><span class="bg-indigo-100 text-indigo-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">Block Universe</span></li>
+                            <li><span class="bg-indigo-100 text-indigo-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">Illusion of Passage</span></li>
+                            <li><span class="bg-indigo-100 text-indigo-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded">Spacetime Manifold</span></li>
+                        </ul>
+                        <p class="mt-6 text-sm italic text-stone-500">This view aligns with Einstein's theory of relativity.</p>
                     </div>
                 </div>
-            </div>
-             <p class="text-center text-gray-500 mt-4 italic">The two aspects emerge simultaneously from a single source.</p>
-        </section>
-        
-        <section id="interactive-creator" class="card p-8 mb-16">
-            <h2 class="text-3xl font-bold mb-4 text-center text-white">3. Classical Time as the Paradox Creator</h2>
-            <p class="text-gray-400 max-w-3xl mx-auto text-center mb-10">We perceive the Hard Problem because our classical minds require a linear story. "Classical Time" acts as a "syntax of meaning," taking the unified quantum event and *rendering* it as a cause-and-effect sequence for us to understand. Use the toggle below to see this transformation.</p>
+            </section>
+
+            <section id="electrome" class="content-section min-h-screen pt-16">
+                <h3 class="text-2xl md:text-3xl font-bold mb-2">II. The Electrome: The Blueprint of Life</h3>
+                <p class="text-stone-600 mb-8 max-w-3xl">Bridging the gap between fundamental physics and living organisms is the <span class="font-semibold text-stone-800">Electrome</span>: the complete, dynamic pattern of bioelectric fields within an organism. This non-genetic information layer acts as an energetic blueprint, guiding how the genetic "hardware" is deployed to build and maintain a body.</p>
+                <div class="bg-white/60 p-6 rounded-xl shadow-sm border border-stone-200">
+                    <p class="text-center font-semibold mb-4 text-stone-800">How It Works: A Multi-Scale System</p>
+                     <p class="text-center text-sm text-stone-600 mb-6">Click the (+) icons to learn more.</p>
+                    <div class="relative w-full max-w-lg mx-auto p-4">
+                       <div class="flex flex-col items-center space-y-4">
+                            <div class="w-full border-2 border-dashed border-teal-300 p-4 rounded-lg text-center has-tooltip relative">
+                               <p class="font-bold text-teal-800">Organism Level</p>
+                               <p class="text-sm text-teal-700">Overall Anatomical Plan</p>
+                               <button class="interactive-hotspot absolute -right-3 -top-3" data-title="Morphogenetic Fields" data-text="The Electrome constitutes the physical basis for the 'morphogenetic field,' a concept that describes an invisible blueprint guiding anatomical development and regeneration. It dictates the overall body plan.">+</button>
+                            </div>
+                            <div class="text-2xl text-teal-500">↓</div>
+                            <div class="w-10/12 border-2 border-dashed border-cyan-300 p-4 rounded-lg text-center has-tooltip relative">
+                                <p class="font-bold text-cyan-800">Tissue Level</p>
+                                <p class="text-sm text-cyan-700">Transepithelial Potentials</p>
+                                <button class="interactive-hotspot absolute -right-3 -top-3" data-title="Tissue-Level Gradients" data-text="Aligned cells in tissues like skin create large voltage gradients. When wounded, this gradient is short-circuited, creating a 'current of injury' that guides healing cells to the damage site.">+</button>
+                            </div>
+                             <div class="text-2xl text-cyan-500">↓</div>
+                            <div class="w-8/12 border-2 border-dashed border-sky-300 p-4 rounded-lg text-center has-tooltip relative">
+                                <p class="font-bold text-sky-800">Cellular Level</p>
+                                <p class="text-sm text-sky-700">Membrane Potential (Vmem)</p>
+                                <button class="interactive-hotspot absolute -right-3 -top-3" data-title="Cellular Batteries" data-text="Each cell maintains a voltage across its membrane (Vmem), acting as a tiny battery. Groups of cells can coordinate their Vmem via gap junctions to create bioelectric patterns that pre-figure structures like an eye.">+</button>
+                            </div>
+                             <div class="text-2xl text-sky-500">↓</div>
+                             <div class="w-6/12 border-2 border-dashed border-indigo-300 p-4 rounded-lg text-center has-tooltip relative">
+                                <p class="font-bold text-indigo-800">Molecular Level</p>
+                                <p class="text-sm text-indigo-700">Ion Channels & Pumps</p>
+                                <button class="interactive-hotspot absolute -right-3 -top-3" data-title="The Molecular Engines" data-text="The entire system is powered by molecular machines—ion channels and pumps—that use energy to move charged ions like sodium and potassium across the cell membrane, creating the fundamental charge separation.">+</button>
+                            </div>
+                       </div>
+                    </div>
+                </div>
+            </section>
             
-            <div class="flex justify-center mb-10">
-                <div class="flex rounded-full bg-gray-800 p-1">
-                    <button id="quantum-view-btn" class="toggle-btn active font-semibold py-2 px-6 rounded-full">Quantum View</button>
-                    <button id="classical-view-btn" class="toggle-btn font-semibold py-2 px-6 rounded-full">Classical View</button>
+            <div id="modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
+                <div class="bg-white rounded-lg p-6 max-w-lg w-full relative">
+                    <h4 id="modal-title" class="text-lg font-bold mb-2"></h4>
+                    <p id="modal-text" class="text-stone-600"></p>
+                    <button id="modal-close" class="absolute top-2 right-2 text-2xl font-bold text-stone-400 hover:text-stone-800">&times;</button>
                 </div>
             </div>
 
-            <div id="diagram-container" class="relative w-full h-48 flex items-center justify-center bg-black/20 rounded-lg overflow-hidden">
-                <!-- Unified Potential Orb -->
-                <div id="unified-orb" class="card quantum-orb p-6 text-center z-10">
-                    <h3 class="font-bold">Unified Potential</h3>
+            <section id="clocks" class="content-section min-h-screen pt-16">
+                <h3 class="text-2xl md:text-3xl font-bold mb-2">III. The Clocks Within: Biological & Perceptual Time</h3>
+                <p class="text-stone-600 mb-8 max-w-3xl">Our experience of time is governed by two distinct, yet interconnected systems: an objective, biological clockwork with ancient genetic roots, and a subjective, perceptual clock constructed by our brain that is surprisingly malleable. Click the chart segments to explore each.</p>
+                <div class="flex flex-col lg:flex-row gap-8 items-center">
+                    <div class="chart-container">
+                        <canvas id="clocksChart"></canvas>
+                    </div>
+                    <div id="clock-details" class="flex-1 bg-white/60 p-6 rounded-xl shadow-sm border border-stone-200 min-h-[300px]">
+                        <h4 id="details-title" class="text-xl font-semibold text-stone-800 mb-3">Select a Clock</h4>
+                        <p id="details-text" class="text-stone-600">Click on a segment of the doughnut chart to learn more about the two primary timekeeping systems that define our temporal reality.</p>
+                    </div>
                 </div>
-                <!-- Linear Components -->
-                <div id="physical-box" class="card p-4 text-center absolute opacity-0" style="left: -100%;">
-                    <h3 class="font-bold">Neural Firing</h3>
-                </div>
-                <div id="arrow" class="text-4xl font-mono text-purple-400 absolute opacity-0">&rarr;</div>
-                <div id="qualia-box" class="card p-4 text-center absolute opacity-0" style="right: -100%;">
-                    <h3 class="font-bold">Experience</h3>
-                </div>
-            </div>
-             <p id="view-caption" class="text-center text-gray-500 mt-4 italic">Viewing reality from its fundamental, non-linear state.</p>
-        </section>
+            </section>
 
-        <section id="conclusion" class="text-center py-16">
-             <h2 class="text-3xl font-bold text-white mb-8">Conclusion: Dissolving the Problem</h2>
-             <div class="grid md:grid-cols-2 gap-8">
-                 <div class="card p-6">
-                     <h3 class="text-xl font-bold mb-3 header-gradient">A Problem of Perspective</h3>
-                     <p class="text-gray-400">The Hard Problem is not a feature of reality, but a product of our limited, classical-temporal viewpoint. It's a conceptual paradox, not a physical one.</p>
-                 </div>
-                 <div class="card p-6">
-                     <h3 class="text-xl font-bold mb-3 header-gradient">A New Identity</h3>
-                     <p class="text-gray-400">This reframes our identity: we are not physical machines that mysteriously produce consciousness, but conscious agents manifesting a reality that is then recorded in the linear syntax of classical time.</p>
-                 </div>
-             </div>
-        </section>
+            <section id="dissonance" class="content-section min-h-screen pt-16">
+                <h3 class="text-2xl md:text-3xl font-bold mb-2">IV. Biotemporal Dissonance: When Time Breaks Down</h3>
+                <p class="text-stone-600 mb-8 max-w-3xl"><span class="font-semibold text-stone-800">Biotemporal Dissonance</span> is the psychophysiological stress from a conflict between the body's internal time and its experienced reality. This conflict generates measurable tension and can lead to disease. Click the cards below to explore its different forms.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Dissonance Cards will be injected here by JS -->
+                </div>
+            </section>
 
+            <section id="xqe" class="content-section min-h-screen pt-16">
+                 <h3 class="text-2xl md:text-3xl font-bold mb-2">V. Speculative Frontiers: The Compositional Paradigm</h3>
+                 <p class="text-stone-600 mb-8 max-w-3xl">The Xenial Quantum Economy (XQE) framework proposes a radical shift from viewing reality as something passively observed to something actively <span class="font-semibold text-stone-800">composed</span> through conscious measurement. It is a speculative model for a physics of coherent, intentional creation.</p>
+                 <div class="bg-white/60 p-6 rounded-xl shadow-sm border border-stone-200">
+                     <p class="text-center font-semibold mb-6 text-stone-800">Core Components of Compositional Physics</p>
+                     <div class="space-y-4">
+                        <div class="has-tooltip relative border-l-4 border-purple-400 pl-4 py-2">
+                             <h4 class="font-bold">1. The Time Coefficient (τₖ)</h4>
+                             <div class="tooltip absolute -top-20 left-0 w-64 bg-stone-800 text-white text-xs rounded p-2 z-10">A measure of a system's internal coherence that determines which physical laws dominate. Higher coherence allows for "compositional physics," where agents can intentionally create reality.</div>
+                        </div>
+                        <div class="text-2xl text-purple-500 pl-5">↓</div>
+                         <div class="has-tooltip relative border-l-4 border-pink-400 pl-4 py-2">
+                             <h4 class="font-bold">2. Live Information Tokens (LITs)</h4>
+                             <div class="tooltip absolute -top-20 left-0 w-64 bg-stone-800 text-white text-xs rounded p-2 z-10">Quantized, stable patterns of meaning impressed upon the unmanifested potential (`Prima Materia`) by an act of consciousness.</div>
+                        </div>
+                        <div class="text-2xl text-pink-500 pl-5">↓</div>
+                        <div class="has-tooltip relative border-l-4 border-rose-400 pl-4 py-2">
+                             <h4 class="font-bold">3. Harmonic Biotemporal Regulation</h4>
+                             <div class="tooltip absolute -top-20 left-0 w-64 bg-stone-800 text-white text-xs rounded p-2 z-10">Aging is seen as signal degradation (decoherence) in the bioelectric field. Rejuvenation can be achieved by introducing a "coherence agent" (Symbolic LIT) that cancels the noise of dissonance.</div>
+                        </div>
+                     </div>
+                     <div class="mt-8 border-t border-stone-200 pt-6">
+                         <p class="font-semibold text-center text-stone-700">The Composer's Burden:</p>
+                         <blockquote class="mt-2 text-center italic text-stone-600">"To observe is to create. To exist is to expand. To age is to dissonate. The quality of our composition determines the health of its substrate."</blockquote>
+                         <p class="mt-4 text-center text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-rose-500">Choose Harmonically.</p>
+                     </div>
+                 </div>
+            </section>
+        </main>
     </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const quantumBtn = document.getElementById('quantum-view-btn');
-    const classicalBtn = document.getElementById('classical-view-btn');
-    
-    const unifiedOrb = document.getElementById('unified-orb');
-    const physicalBox = document.getElementById('physical-box');
-    const arrow = document.getElementById('arrow');
-    const qualiaBox = document.getElementById('qualia-box');
-    const caption = document.getElementById('view-caption');
 
-    function setQuantumView() {
-        quantumBtn.classList.add('active');
-        classicalBtn.classList.remove('active');
+    const app = {
+        clocksData: {
+            "objective": {
+                title: "The Objective Clock (Chronobiology)",
+                text: "This is the body's innate, genetically encoded timekeeping system. A Master Clock (SCN) in the brain orchestrates a federation of Peripheral Clocks in every organ. It's aligned with the 24-hour day by external cues called Zeitgebers (e.g., light, food). Its physical substrate is governed by molecular 'clock gene' feedback loops."
+            },
+            "subjective": {
+                title: "The Subjective Clock (Chronoception)",
+                text: "This is the brain's constructed, malleable perception of time's passage. It is not a single clock but a distributed system. Our sense of time stretches and compresses based on Attention, Emotion, and Novelty. Its physical substrates are quantified by EEG Brainwaves (acting as ~10 Hz 'perceptual frames') and Heart Rate Variability (HRV) (an 'interoceptive pacemaker')."
+            }
+        },
 
-        // Orb becomes visible and central
-        unifiedOrb.style.opacity = '1';
-        unifiedOrb.style.transform = 'translateX(0) scale(1)';
-        unifiedOrb.style.zIndex = '10';
+        dissonanceData: [
+            {
+                type: 'Internal (Chronodisruption)',
+                icon: '⏰',
+                color: 'bg-amber-100',
+                conflict: 'Misalignment of internal clocks with the environment.',
+                example: 'Night Shifts, Artificial Light, Mistimed Eating.',
+                effects: 'Metabolic Syndrome, Cancer Risk, Mood Disorders, Cardiovascular Disease.'
+            },
+            {
+                type: 'External (Temporal Displacement)',
+                icon: '🚀',
+                color: 'bg-blue-100',
+                conflict: 'Misalignment of biological age with objective time.',
+                example: 'Cryosleep, Near-Light Speed Travel.',
+                effects: 'Social Alienation, Identity Crisis, Anachronism, Existential Loss.'
+            },
+            {
+                type: 'Paradoxical (Causal Inconsistency)',
+                icon: '⏳',
+                color: 'bg-green-100',
+                conflict: 'Contradiction between biological existence and causal history.',
+                example: 'The Grandfather Paradox in time travel.',
+                effects: 'Existential Paradox, Logical Threat to Selfhood, Physical Trauma.'
+            },
+            {
+                type: 'Virtual (Perceptual Dislocation)',
+                icon: '🕶️',
+                color: 'bg-purple-100',
+                conflict: 'Discrepancy between perceived time in a simulation and the body\'s real-time state.',
+                example: 'Immersive VR.',
+                effects: 'Time Compression Effect, Dissociation from Reality, Neglect of Biological Needs.'
+            }
+        ],
 
-        // Linear components hide
-        physicalBox.style.opacity = '0';
-        physicalBox.style.transform = 'translateX(0) scale(0.5)';
-        arrow.style.opacity = '0';
-        arrow.style.transform = 'scale(0)';
-        qualiaBox.style.opacity = '0';
-        qualiaBox.style.transform = 'translateX(0) scale(0.5)';
+        init() {
+            this.setupScrollspy();
+            this.setupIntersectionObserver();
+            this.createClocksChart();
+            this.renderDissonanceCards();
+            this.setupHotspots();
+        },
         
-        caption.textContent = "Viewing reality from its fundamental, non-linear state.";
-    }
+        setupHotspots() {
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalText = document.getElementById('modal-text');
+            const modalClose = document.getElementById('modal-close');
 
-    function setClassicalView() {
-        classicalBtn.classList.add('active');
-        quantumBtn.classList.remove('active');
+            document.querySelectorAll('.interactive-hotspot').forEach(hotspot => {
+                hotspot.addEventListener('click', () => {
+                    modalTitle.textContent = hotspot.dataset.title;
+                    modalText.textContent = hotspot.dataset.text;
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                });
+            });
+
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            };
+
+            modalClose.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        },
+
+        setupScrollspy() {
+            const sections = document.querySelectorAll('main section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: "-50% 0px -50% 0px" });
+
+            sections.forEach(section => observer.observe(section));
+        },
         
-        // Orb hides
-        unifiedOrb.style.opacity = '0';
-        unifiedOrb.style.transform = 'scale(0.5)';
-        unifiedOrb.style.zIndex = '0';
+        setupIntersectionObserver() {
+            const sections = document.querySelectorAll('.content-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
 
-        // Linear components appear and spread out
-        const containerWidth = document.getElementById('diagram-container').offsetWidth;
-        const offset = containerWidth > 500 ? '40%' : '35%';
+            sections.forEach(section => observer.observe(section));
+        },
+        
+        createClocksChart() {
+            const ctx = document.getElementById('clocksChart').getContext('2d');
+            const detailsTitle = document.getElementById('details-title');
+            const detailsText = document.getElementById('details-text');
+            
+            const chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Objective Clock (Chronobiology)', 'Subjective Clock (Chronoception)'],
+                    datasets: [{
+                        label: 'Clock Types',
+                        data: [50, 50],
+                        backgroundColor: [
+                            'rgba(168, 85, 247, 0.2)', // purple
+                            'rgba(59, 130, 246, 0.2)'  // blue
+                        ],
+                        borderColor: [
+                            'rgba(168, 85, 247, 1)',
+                            'rgba(59, 130, 246, 1)'
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '50%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            enabled: true
+                        }
+                    },
+                    onClick: (evt, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const key = index === 0 ? 'objective' : 'subjective';
+                            const data = this.clocksData[key];
+                            detailsTitle.textContent = data.title;
+                            detailsText.textContent = data.text;
+                        }
+                    }
+                }
+            });
+        },
 
-        physicalBox.style.opacity = '1';
-        physicalBox.style.transform = `translateX(-${offset}) scale(1)`;
-        arrow.style.opacity = '1';
-        arrow.style.transform = 'scale(1)';
-        qualiaBox.style.opacity = '1';
-        qualiaBox.style.transform = `translateX(${offset}) scale(1)`;
+        renderDissonanceCards() {
+            const container = document.querySelector('#dissonance .grid');
+            let cardsHTML = '';
+            this.dissonanceData.forEach(item => {
+                cardsHTML += `
+                <div class="card-container h-80">
+                    <div class="card relative w-full h-full">
+                        <div class="card-face absolute w-full h-full p-6 rounded-xl shadow-sm border border-stone-200 ${item.color} flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center gap-4 mb-3">
+                                    <span class="text-4xl">${item.icon}</span>
+                                    <h4 class="text-xl font-semibold text-stone-800">${item.type}</h4>
+                                </div>
+                                <p class="text-stone-700">${item.conflict}</p>
+                            </div>
+                            <button class="card-flipper self-start mt-4 px-4 py-2 bg-stone-800 text-white rounded-md text-sm font-semibold hover:bg-stone-900">Learn More</button>
+                        </div>
+                        <div class="card-back absolute w-full h-full p-6 rounded-xl shadow-lg border bg-white flex flex-col justify-between">
+                             <div>
+                                <h5 class="font-bold mb-2">Key Details:</h5>
+                                <p class="text-sm mb-2"><strong class="font-semibold">Example:</strong> ${item.example}</p>
+                                <p class="text-sm"><strong class="font-semibold">Key Effects:</strong> ${item.effects}</p>
+                            </div>
+                            <button class="card-flipper self-start mt-4 px-4 py-2 bg-stone-200 text-stone-800 rounded-md text-sm font-semibold hover:bg-stone-300">Go Back</button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+            container.innerHTML = cardsHTML;
+            this.setupCardFlippers();
+        },
 
-        caption.textContent = "Classical Time 'unfolds' the event into a linear, cause-and-effect sequence.";
-    }
+        setupCardFlippers() {
+            document.querySelectorAll('.card-flipper').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.currentTarget.closest('.card').classList.toggle('is-flipped');
+                });
+            });
+        }
+    };
 
-    quantumBtn.addEventListener('click', setQuantumView);
-    classicalBtn.addEventListener('click', setClassicalView);
+    app.init();
 });
 </script>
 </body>
