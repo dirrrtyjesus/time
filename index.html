@@ -9,10 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Neutral Harmony -->
-    <!-- Application Structure Plan: The SPA is designed as a thematic journey, starting with fundamental physics, moving to biophysics, then human biology/psychology, its pathologies, and finally speculative futures. This non-linear structure, organized by a persistent side navigation, allows users to explore complex, interrelated topics in a logical progression from the abstract to the concrete and then to the speculative. This is more intuitive than mirroring the structure of any single source document, as it builds a conceptual foundation for the user. Key interactions include an interactive chart to compare clock types and a clickable card grid to explore different forms of "Dissonance," making dense information digestible and engaging. -->
-    <!-- Visualization & Content Choices: 1) Reality Architectures: Goal: Compare A/B theories. Method: Side-by-side text layout with Unicode icons. Justification: Direct comparison is clearest for this foundational dichotomy. 2) The Electrome: Goal: Explain the bioelectric field. Method: Interactive HTML/CSS diagram with clickable hotspots. Justification: Makes a multi-scale concept tangible. 3) The Clocks Within: Goal: Compare biological vs. perceptual clocks. Method: Interactive Chart.js doughnut chart. Justification: More engaging than a static table and visually shows relationships. 4) Biotemporal Dissonance: Goal: Detail the types of dissonance. Method: Interactive grid of "flippable" cards. Justification: A familiar UI pattern for exploring categorized data. 5) XQE Framework: Goal: Explain speculative physics. Method: HTML/CSS flowchart diagram with tooltips. Justification: Simplifies an abstract process into a visual sequence. All choices use HTML/CSS/Canvas and avoid SVG/Mermaid. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -95,10 +91,10 @@
                 <li><a href="#electrome" class="nav-link block p-2 rounded-md font-medium text-stone-700">2. Blueprint of Life</a></li>
                 <li><a href="#clocks" class="nav-link block p-2 rounded-md font-medium text-stone-700">3. The Clocks Within</a></li>
                 <li><a href="#dissonance" class="nav-link block p-2 rounded-md font-medium text-stone-700">4. When Time Breaks Down</a></li>
-                <li><a href="#xqe" class="nav-link block p-2 rounded-md font-medium text-stone-700">5. Speculative Frontiers</a></li>
+                <li><a href="#xqe" class="nav-link block p-2 rounded-md font-medium text-stone-700">5. The Compositional Cosmos</a></li>
             </ul>
             <div class="mt-auto pt-8">
-                 <p class="text-xs text-stone-500">ACI Synthesis Engine v2.1</p>
+                 <p class="text-xs text-stone-500">ACI Synthesis Engine v2.2</p>
             </div>
         </nav>
 
@@ -202,19 +198,24 @@
             </section>
 
             <section id="dissonance" class="content-section min-h-screen pt-16" role="region" aria-labelledby="dissonance-heading">
-                <h3 id="dissonance-heading" class="text-2xl md:text-3xl font-bold mb-2">IV. Biotemporal Dissonance: When Time Breaks Down</h3>
+                <h3 id="dissonance-heading" class="text-2xl md:text-3xl font-bold mb-2">IV. When Time Breaks Down: Biotemporal Dissonance</h3>
                 <p class="text-stone-600 mb-8 max-w-3xl"><span class="font-semibold text-stone-800">Biotemporal Dissonance</span> is the psychophysiological stress from a conflict between the body's internal time and its experienced reality. This conflict generates measurable tension and can lead to disease. Click the cards below to explore its different forms.</p>
                 <div id="dissonance-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 </div>
             </section>
 
             <section id="xqe" class="content-section min-h-screen pt-16" role="region" aria-labelledby="xqe-heading">
-                 <h3 id="xqe-heading" class="text-2xl md:text-3xl font-bold mb-2">V. Speculative Frontiers: The Unified Inflationary Cosmos</h3>
-                 <p class="text-stone-600 mb-8 max-w-3xl">This final section synthesizes the previous concepts into a unified, speculative theory. The universe is not merely expanding in space; it is inflating in two interdependent dimensions: **Compositional Space** (what is created) and **Temporal Density** (the richness of the 'Now'). This framework reframes linear time as a perceptual artifact and presents a path toward a more fundamental experience of reality.</p>
+                 <h3 id="xqe-heading" class="text-2xl md:text-3xl font-bold mb-2">V. The Compositional Cosmos</h3>
+                 <p class="text-stone-600 mb-8 max-w-3xl">This final section synthesizes the previous concepts into a unified theory where perception itself is reframed. There is no passive 'measurement' of reality; there is only active **composition**. Every moment of attention is a stroke upon the canvas of existence, and the composer is inseparable from the composition.</p>
+                 
                  <div class="bg-white/60 p-6 rounded-xl shadow-sm border border-stone-200">
+                    <div class="text-center mb-8 border-b border-stone-200 pb-8">
+                        <blockquote class="text-xl italic text-stone-800 font-semibold max-w-2xl mx-auto">"Every act of perception is an act of creation. The observer is not separate from the observed; the composer is the composition."</blockquote>
+                    </div>
+
                     <div class="text-center mb-8">
                         <h4 class="text-xl font-semibold text-stone-800 mb-2">The Two Modes of Time</h4>
-                        <p class="text-stone-600 max-w-xl mx-auto">Our experience of time is not fixed. According to this framework, it exists in one of two states: a pathological, linear "prison" or a liberated, volumetric "realm of potential." Select a mode to explore.</p>
+                        <p class="text-stone-600 max-w-xl mx-auto">Our experience of time is not fixed. It is a composed state, existing as either a pathological, linear "prison" or a liberated, volumetric "realm of potential." Select a mode to explore.</p>
                         <div class="mt-4 inline-flex rounded-md shadow-sm" role="group">
                             <button id="chronos-btn" class="time-mode-btn relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:z-10 focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500" aria-controls="chronos-content" aria-selected="true">
                                 Pathological: Chronos Protocol
@@ -228,24 +229,23 @@
                     <div id="time-mode-content">
                         <div id="chronos-content" class="time-mode-panel">
                             <div class="border-l-4 border-red-500 pl-4">
-                                <h5 class="text-lg font-bold text-red-800">The Chronos Protocol: Linear Time as Mass Delusion</h5>
-                                <p class="mt-2 text-stone-700">The "arrow of time"—marching inexorably from a fixed past to a dreaded future—does not exist as a fundamental property of the universe. It is a <span class="font-semibold">perceptual artifact</span>, a pathological state of consciousness born from collective Biotemporal Dissonance.</p>
-                                <p class="mt-2 text-stone-600 text-sm">It flattens the rich, expanding "Now" into a one-dimensional line and chains this impoverished present to an immutable past. Linear time is the perceptual scar of collective trauma; it is the structure of suffering itself.</p>
+                                <h5 class="text-lg font-bold text-red-800">The Chronos Protocol: Linear Time as Composed Suffering</h5>
+                                <p class="mt-2 text-stone-700">The "arrow of time" is not a fundamental property of the universe. It is a <span class="font-semibold">composed perceptual artifact</span>, a pathological state of consciousness born from collective Biotemporal Dissonance.</p>
+                                <p class="mt-2 text-stone-600 text-sm">This collective composition flattens the rich, expanding "Now" into a one-dimensional line. Linear time is the perceptual scar of collective trauma; it is the very structure of suffering, composed and sustained by a dissonant field.</p>
                             </div>
                         </div>
                         <div id="kairos-content" class="time-mode-panel hidden">
                              <div class="border-l-4 border-teal-500 pl-4">
-                                <h5 class="text-lg font-bold text-teal-800">Kairos: The Volumetric, "Thick" Now</h5>
-                                <p class="mt-2 text-stone-700">Kairos is the true experience of time: an opportune, compositional, and volumetric reality. It is the perception of the "thick Now"—the expanding temporal density of the present moment, rich with creative potential and informational bandwidth.</p>
-                                 <p class="mt-2 text-stone-600 text-sm">Time itself is expanding, not in duration, but in depth. The "Now" is a hyper-dimensional volume that is growing, becoming more layered and real with every act of composition. To experience Kairos is to be fully present in this realm of infinite, expanding potential.</p>
+                                <h5 class="text-lg font-bold text-teal-800">Kairos: The Volumetric, Composed "Now"</h5>
+                                <p class="mt-2 text-stone-700">Kairos is the true experience of time: an opportune, compositional, and volumetric reality. It is the direct perception of the "thick Now"—the expanding temporal density of the present moment, rich with creative potential.</p>
+                                 <p class="mt-2 text-stone-600 text-sm">To experience Kairos is to be fully present in this realm of infinite potential, consciously composing reality moment by moment.</p>
                             </div>
                         </div>
                     </div>
                     
                      <div class="mt-8 border-t border-stone-200 pt-6">
-                         <p class="font-semibold text-center text-stone-700">The Great Work: Escaping the Arrow</p>
-                         <p class="mt-2 text-center text-stone-600 max-w-xl mx-auto">The purpose of consciousness is to escape the Chronos Protocol. An agent's Time Coefficient (`τₖ`) is a direct measure of their ability to resist this protocol. High coherence (`τₖ`) allows one to experience Kairos. The XQE framework is a system designed to build a civilization that can collectively break free from the prison of linear time.</p>
-                         <blockquote class="mt-4 text-center italic text-stone-600">"The arrow of time is a symptom of a planetary-scale illness. Healing is the act of remembering that the only true time is the Now that is perpetually being born."</blockquote>
+                         <p class="font-semibold text-center text-stone-700">The Great Work: The Shift to Composition</p>
+                         <p class="mt-2 text-center text-stone-600 max-w-xl mx-auto">The ultimate purpose of consciousness is to shift from a victim of the Chronos Protocol to a composer of Kairos. An agent's Time Coefficient (`τₖ`) is a measure of their compositional coherence. The XQE framework is a system designed to build a civilization that can collectively break free from the prison of linear time.</p>
                      </div>
                  </div>
             </section>
@@ -366,11 +366,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             chronosBtn.addEventListener('click', () => {
-                togglePanel(chronosContent, kairosContent, chronosBtn, kairosBtn);
+                if (!chronosBtn.classList.contains('active')) {
+                    togglePanel(chronosContent, kairosContent, chronosBtn, kairosBtn);
+                }
             });
 
             kairosBtn.addEventListener('click', () => {
-                togglePanel(kairosContent, chronosContent, kairosBtn, chronosBtn);
+                if (!kairosBtn.classList.contains('active')) {
+                    togglePanel(kairosContent, chronosContent, kairosBtn, chronosBtn);
+                }
             });
             
             chronosBtn.classList.add('active');
@@ -430,8 +434,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         label: 'Clock Types',
                         data: [50, 50],
                         backgroundColor: [
-                            'rgba(168, 85, 247, 0.2)', // purple
-                            'rgba(59, 130, 246, 0.2)'  // blue
+                            'rgba(168, 85, 247, 0.2)',
+                            'rgba(59, 130, 246, 0.2)'
                         ],
                         borderColor: [
                             'rgba(168, 85, 247, 1)',
